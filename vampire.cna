@@ -1,0 +1,66 @@
+
+# Author: Patrick Hurd, Penetration Tester, Coalfire Federal 2019
+
+popup beacon_bottom {
+	item "Mark Owned" {
+		dialog_show(create_owned_dialog($1));
+	}
+}
+
+sub create_owned_dialog {
+	$beacon = $1;
+	$owned_dialog = dialog("Mark Owned", %(), lambda({owned_dialog_callback($beacon, $2, $3)}));
+	dialog_description($owned_dialog, "Mark node(s) as owned in BloodHound. Neo4j must be up and running on localhost:7474.");
+
+	drow_combobox($owned_dialog, "node_type", "Node Type:", @('Default', 'User', 'Computer'));
+	$proc = exec("./owned_utils.py -r domains");
+	$d_line = readln($proc);
+	@domains = split(",", $d_line);
+	closef($proc);
+	drow_combobox($owned_dialog, "domain", "Domain:", @domains);
+
+	dbutton_action($owned_dialog, "Go");
+	return $owned_dialog;
+}
+
+sub owned_dialog_callback {
+	foreach $id ($1) {
+		$username = "";
+		$computer = "";
+		foreach $b (beacons()) {
+			if ($b["id"] == int($id)) {
+				$username = $b["user"];
+				$computer = $b["computer"];
+			}
+		}
+		# Cobalt Strike shows local admins as "CompUser *"
+		$is_admin = 0;
+		if ($username ismatch '.* \*') {
+			$is_admin = 1;
+		}
+		$is_system = 0;
+		if ($username ismatch 'SYSTEM \*') {
+			$is_system = 1;
+		}
+		$username = matches($username, "([^ ]*)")[0];
+		# Append @domain.tld
+		$username = $username . "@" . $3["domain"];
+		$computer = $computer . "@" . $3["domain"];
+		if ($3["node_type"] eq "Default") {
+			if ($is_system) {
+				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
+			} else if ($is_admin) {
+				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "User", "-l", $username));
+				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
+			} else {
+				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "User", "-l", $username));
+			}
+		}
+		if ($3["node_type"] eq "User") {
+			exec(@("./owned_utils.py", "-r", "owned", "-t", "User", "-l", $username));
+		}
+		if ($3["node_type"] eq "Computer") {
+			exec(@("./owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
+		}
+	}
+}
