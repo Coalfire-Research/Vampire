@@ -1,6 +1,6 @@
 # Vampire
 
-__Vampire__ (tentative) is an aggressor script which adds a "Mark Owned" right click option to beacons. This allows you to select either the Computer or User (or Default, which will choose based on your user), along with the domain they belong to. Vampire will communicate with your neo4j REST API on localhost:7474 to mark the node as owned.
+__Vampire__ is an aggressor script which adds a "Mark Owned" right click option to beacons. This allows you to select either the Computer or User (or Default, which will choose based on your user), along with the domain they belong to. Vampire will communicate with your neo4j REST API on localhost:7474 to mark the node as owned.
 
 <img src="Screen_Shot_2019-04-02_at_3.31.18_PM.png" width="30%">
 <img src="Screen_Shot_2019-04-02_at_3.31.54_PM.png" width="30%">
