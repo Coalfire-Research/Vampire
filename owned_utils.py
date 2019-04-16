@@ -54,7 +54,7 @@ def decide(nodetype, nodelabel):
 		mark_owned(nodetype, nodelabel)
 
 def mark_owned(nodetype, nodelabel):
-	statement = "MATCH (n:" + nodetype + " {name:'" + nodelabel + "'}) SET n.owned=TRUE"
+	statement = 'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" SET n.owned = TRUE'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
 		"Authorization": "bmVvNGo6Qmxvb2Rob3VuZA==" }
@@ -73,7 +73,7 @@ def create(nodetype, nodelabel):
 	r = requests.post(url=url,headers=headers,json=data)
 
 def exists(nodetype, nodelabel):
-	statement = "MATCH (n:" + nodetype + " {name:'" + nodelabel + "'}) RETURN n"
+	statement = 'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" RETURN n'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
 		"Authorization": "bmVvNGo6Qmxvb2Rob3VuZA==" }
