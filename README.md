@@ -45,3 +45,8 @@ How it works
  4. For `Default`, it will choose based on whether you're a local admin
  4. Use `owned_utils.py` to query the neo4j REST API
     - `"MATCH (n:" + nodetype + " {name:'" + nodelabel + "'}) SET n.owned=TRUE"`
+
+Author
+---
+
+Patrick Hurd
