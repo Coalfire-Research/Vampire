@@ -9,7 +9,7 @@ How to use
 ---
 
  0. Put `vampire.cna` and `owned_utils.py` in the root of your cobaltstrike folder
- 1. `chown u+x owned_utils.py`
+ 1. `chmod u+x owned_utils.py`
  1. Load `vampire.cna` into Cobalt Strike
  1. Rain shells
  2. Start neo4j and BloodHound as normal
