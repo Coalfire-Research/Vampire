@@ -48,12 +48,12 @@ sub owned_dialog_callback {
 		$computer = $computer . "@" . $3["domain"];
 		if ($3["node_type"] eq "Default") {
 			if ($is_system) {
-				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
+				exec(@("./owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
 			} else if ($is_admin) {
-				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "User", "-l", $username));
-				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
+				exec(@("./owned_utils.py", "-r", "owned", "-t", "User", "-l", $username));
+				exec(@("./owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
 			} else {
-				exec(@("/home/foob/build/customcna/owned_utils.py", "-r", "owned", "-t", "User", "-l", $username));
+				exec(@("./owned_utils.py", "-r", "owned", "-t", "User", "-l", $username));
 			}
 		}
 		if ($3["node_type"] eq "User") {
