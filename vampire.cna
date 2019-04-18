@@ -41,6 +41,8 @@ sub owned_dialog_callback {
 		$is_system = 0;
 		if ($username ismatch 'SYSTEM \*') {
 			$is_system = 1;
+		} else if ($username ismatch 'Administrator \*') {
+			$is_system = 1;
 		}
 		$username = matches($username, "([^ ]*)")[0];
 		# Append @domain.tld
