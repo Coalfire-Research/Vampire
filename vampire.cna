@@ -45,7 +45,7 @@ sub owned_dialog_callback {
 		$username = matches($username, "([^ ]*)")[0];
 		# Append @domain.tld
 		$username = $username . "@" . $3["domain"];
-		$computer = $computer . "@" . $3["domain"];
+		$computer = $computer . "." . $3["domain"];
 		if ($3["node_type"] eq "Default") {
 			if ($is_system) {
 				exec(@("./owned_utils.py", "-r", "owned", "-t", "Computer", "-l", $computer));
