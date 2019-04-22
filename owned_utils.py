@@ -5,9 +5,6 @@
 import requests, json
 import getopt, sys
 
-# base64("neo4j:BloodHound")
-auth = "bmVvNGo6Qmxvb2Rob3VuZA=="
-
 def main(argv):
 	node_type = ''
 	node_label = ''
@@ -70,7 +67,7 @@ def create(nodetype, nodelabel):
 	statement = "CREATE (n:" + nodetype + ') SET n.name="' + nodelabel + '"'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2Rob3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
@@ -79,7 +76,7 @@ def exists(nodetype, nodelabel):
 	statement = 'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" RETURN n'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2Rob3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
@@ -92,7 +89,7 @@ def get_domains():
 	statement = "MATCH (n:Domain) RETURN n"
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2Rob3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
@@ -106,7 +103,7 @@ def test(nodetype, nodelabel):
 	statement = "MATCH (n:" + nodetype + " {name:'" + nodelabel + "'}) RETURN n"
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2Rob3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
