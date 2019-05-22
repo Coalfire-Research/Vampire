@@ -1,0 +1,62 @@
+
+# Author: Patrick Hurd, Penetration Tester, Coalfire Federal 2019
+
+# Can use `on credentials`, which puts the entirety of the cobalt credentials in $1
+# This isn't a documented use case, but it works.
+# The event fires whenever credentials change - add, remove, etc.
+
+# It doesn't hurt to re-mark users as owned, but let's not.
+@old_creds = @();
+
+# Set to 1 to ignore hashed credentials
+# Usually there will also be a 6 digit pin in this case
+# TODO: Take the 6 digit pin into account
+$ignore_hash = 0;
+
+sub parse_creds {
+	@creds = $1;
+	@new_creds = @();
+	foreach $cred (@creds) {
+		# The user isn't owned until you have an elevated beacon
+		# with which to pass the hash (optional)
+		if (strlen($cred["password"]) == 32 && $ignore_hash) {
+			continue;
+		}
+		if (strlen($cred["realm"]) <= 1) {
+			continue;
+		}
+		# Construct uppercase USER@REALM
+		$useratrealm = uc($cred["user"]) . "@" . uc($cred["realm"]);
+		if ($useratrealm in @old_creds) {
+			continue;
+		}
+		# Search BloodHound for this account
+		println("Checking if account $useratrealm exists");
+		if (!account_exists($useratrealm)) {
+			add(@old_creds, $useratrealm);
+			continue;
+		}
+		# Finally add the account to @old_creds
+		add(@old_creds, $useratrealm);
+	}
+	return @new_creds;
+}
+
+sub account_exists {
+	$account = $1;
+	$proc = exec(@("owned_utils.py", "-r", "exists_like", "-t", "User", "-l", $account));
+	$exists = readln($proc);
+	return $exists == "1";
+}
+
+sub mark_creds_owned {
+	@accounts = $1;
+	for $account (@accounts) {
+		exec(@("owned_utils.py", "-r", "owned_like", "-t", "user", "-l", "$account"));
+		println("Marking $account as owned.");
+	}
+}
+
+on credentials {
+	mark_creds_owned(parse_creds($1));
+}
