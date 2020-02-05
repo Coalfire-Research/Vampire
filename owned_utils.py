@@ -14,11 +14,11 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"hr:t:l:d:",["request=", "type=","label=","domain="])
 	except getopt.GetoptError:
-		print ('test.py -r <request type> -t <node type> -l <node label>')
+		print('test.py -r <request type> -t <node type> -l <node label>')
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print ('test.py -r <request type> -t <node type> -l <node label>')
+			print('test.py -r <request type> -t <node type> -l <node label>')
 			sys.exit()
 		elif opt in ("-r", "--request"):
 			request = arg
@@ -45,10 +45,10 @@ def mux(request, node_type, node_label):
 		print("Error: unknown request type")
 
 def mark_owned(nodetype, nodelabel):
-	statement = 'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" SET n.owned = TRUE'
+	statement = 'Match (n:*) WHERE lower(n.name) = "' + nodelabel.lower() + '" SET n.owned = TRUE'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
@@ -64,7 +64,7 @@ def create(nodetype, nodelabel):
 	r = requests.post(url=url,headers=headers,json=data)
 
 def exists_starts_with(nodetype, nodelabel):
-	statement = 'START n = node(' + nodetype + ') WHERE lower(n.name) STARTS WITH "' + nodelabel.lower() + '" RETURN n'
+	statement = 'MATCH (n:' + nodetype + ') WHERE lower(n.name) STARTS WITH "' + nodelabel.lower() + '" RETURN n'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
 		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
@@ -78,7 +78,7 @@ def exists_starts_with(nodetype, nodelabel):
 		print(0)
 
 def exists(nodetype, nodelabel):
-	statement = 'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" RETURN n'
+	statement = 'MATCH (n:*) WHERE lower(n.name) = "' + nodelabel.lower() + '" RETURN n'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
 		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
