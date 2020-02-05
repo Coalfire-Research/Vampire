@@ -39,7 +39,7 @@ How it works
  3. Append `@` + the specified domain to the user/computer name
  4. For `Default`, it will choose based on whether you're a local admin
  4. Uses `owned_utils.py` to query the neo4j REST API
-    - `'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" SET n.owned = TRUE'`
+    - `'MATCH (n:*) WHERE lower(n.name) = "' + nodelabel.lower() + '" SET n.owned = TRUE'`
 
 ---
  
