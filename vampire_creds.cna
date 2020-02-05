@@ -1,5 +1,5 @@
 
-# Author: Patrick Hurd, Penetration Tester, Coalfire Federal 2019
+# Author: Patrick Hurd, Penetration Tester, Coalfire Federal 2019, 2020
 
 # Can use `on credentials`, which puts the entirety of the cobalt credentials in $1
 # This isn't a documented use case, but it works.
@@ -33,8 +33,7 @@ sub parse_creds {
 		# Search BloodHound for this account
 		println("Checking if account $useratrealm exists");
 		if (!account_exists($useratrealm)) {
-			add(@old_creds, $useratrealm);
-			continue;
+			add(@new_creds, $useratrealm);
 		}
 		# Finally add the account to @old_creds
 		add(@old_creds, $useratrealm);
@@ -44,7 +43,7 @@ sub parse_creds {
 
 sub account_exists {
 	$account = $1;
-	$proc = exec(@("owned_utils.py", "-r", "exists_like", "-t", "User", "-l", $account));
+	$proc = exec(@("./owned_utils.py", "-r", "exists_like", "-t", "User", "-l", $account));
 	$exists = readln($proc);
 	return $exists == "1";
 }
@@ -52,7 +51,7 @@ sub account_exists {
 sub mark_creds_owned {
 	@accounts = $1;
 	for $account (@accounts) {
-		exec(@("owned_utils.py", "-r", "owned_like", "-t", "user", "-l", "$account"));
+		exec(@("./owned_utils.py", "-r", "owned_like", "-t", "user", "-l", "$account"));
 		println("Marking $account as owned.");
 	}
 }
