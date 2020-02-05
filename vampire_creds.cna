@@ -17,6 +17,7 @@ sub parse_creds {
 	@creds = $1;
 	@new_creds = @();
 	foreach $cred (@creds) {
+		println($cred);
 		# The user isn't owned until you have an elevated beacon
 		# with which to pass the hash (optional)
 		if (strlen($cred["password"]) == 32 && $ignore_hash) {
@@ -35,9 +36,10 @@ sub parse_creds {
 		if (!account_exists($useratrealm)) {
 			add(@new_creds, $useratrealm);
 		}
-		# Finally add the account to @old_creds
 		add(@old_creds, $useratrealm);
 	}
+	println(@old_creds);
+	println(@new_creds);
 	return @new_creds;
 }
 
@@ -45,17 +47,21 @@ sub account_exists {
 	$account = $1;
 	$proc = exec(@("./owned_utils.py", "-r", "exists_like", "-t", "User", "-l", $account));
 	$exists = readln($proc);
+	println($exists);
 	return $exists == "1";
 }
 
 sub mark_creds_owned {
+	println("Arg 1: ");
+	println($1);
 	@accounts = $1;
-	for $account (@accounts) {
-		exec(@("./owned_utils.py", "-r", "owned_like", "-t", "user", "-l", "$account"));
+	foreach $account (@accounts) {
+		exec(@("./owned_utils.py", "-r", "owned_like", "-t", "User", "-l", $account));
 		println("Marking $account as owned.");
 	}
 }
 
 on credentials {
-	mark_creds_owned(parse_creds($1));
+	@creds = parse_creds($1);
+	mark_creds_owned(@creds);
 }

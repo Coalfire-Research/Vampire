@@ -1,9 +1,15 @@
 #!/usr/bin/python3
 
-# Author: Patrick Hurd, Penetration Tester, Coalfire Federal 2019
+# Author: Patrick Hurd, Penetration Tester, Coalfire Federal 2019, 2020
 
 import requests, json
 import getopt, sys
+
+headers = { "Accept": "application/json; charset=UTF-8",
+	"Content-Type": "application/json",
+	"Authorization": "bmVvNGo6Qmxvb2Rob3VuZA==" }
+
+url = 'http://localhost:7474/db/data/transaction/commit'
 
 def main(argv):
 	node_type = ''
@@ -18,7 +24,7 @@ def main(argv):
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print('test.py -r <request type> -t <node type> -l <node label>')
+			print ('test.py -r <request type> -t <node type> -l <node label>')
 			sys.exit()
 		elif opt in ("-r", "--request"):
 			request = arg
@@ -41,35 +47,25 @@ def mux(request, node_type, node_label):
 		exists(node_type, node_label)
 	elif request == 'exists_like':
 		exists_starts_with(node_type, node_label)
+	elif request == 'owned_like':
+		owned_starts_with(node_type, node_label)
 	else:
 		print("Error: unknown request type")
 
 def mark_owned(nodetype, nodelabel):
-	statement = 'Match (n:*) WHERE lower(n.name) = "' + nodelabel.lower() + '" SET n.owned = TRUE'
-	headers = { "Accept": "application/json; charset=UTF-8",
-		"Content-Type": "application/json",
-		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
+	statement = f'MATCH (n:{nodetype}) WHERE lower(n.name) = "{nodelabel.lower()}" SET n.owned = TRUE'
 	data = {"statements": [{'statement': statement}]}
-	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
 	print(r.text)
 
 def create(nodetype, nodelabel):
 	statement = "CREATE (n:" + nodetype + ') SET n.name="' + nodelabel + '"'
-	headers = { "Accept": "application/json; charset=UTF-8",
-		"Content-Type": "application/json",
-		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
-	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
 
 def exists_starts_with(nodetype, nodelabel):
-	statement = 'MATCH (n:' + nodetype + ') WHERE lower(n.name) STARTS WITH "' + nodelabel.lower() + '" RETURN n'
-	headers = { "Accept": "application/json; charset=UTF-8",
-		"Content-Type": "application/json",
-		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
+	statement = f'MATCH (n:{nodetype}) WHERE lower(n.name) STARTS WITH "{nodelabel.lower()}" RETURN n'
 	data = {"statements": [{'statement': statement}]}
-	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
 	if nodelabel in r.text:
 		print(1)
@@ -77,13 +73,15 @@ def exists_starts_with(nodetype, nodelabel):
 		print(r.text)
 		print(0)
 
+def owned_starts_with(nodetype, nodelabel):
+	statement = f'MATCH (n:{nodetype}) WHERE lower(n.name) STARTS WITH "{nodelabel.lower()}" SET n.owned = TRUE'
+	data = {"statements": [{'statement': statement}]}
+	r = requests.post(url=url,headers=headers,json=data)
+	print(r.text)
+
 def exists(nodetype, nodelabel):
 	statement = 'MATCH (n:*) WHERE lower(n.name) = "' + nodelabel.lower() + '" RETURN n'
-	headers = { "Accept": "application/json; charset=UTF-8",
-		"Content-Type": "application/json",
-		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
-	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
 	if nodelabel in r.text:
 		return 1
@@ -92,11 +90,7 @@ def exists(nodetype, nodelabel):
 
 def get_domains():
 	statement = "MATCH (n:Domain) RETURN n"
-	headers = { "Accept": "application/json; charset=UTF-8",
-		"Content-Type": "application/json",
-		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
-	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
 	j = json.loads(r.text)
 	output = ''
@@ -106,12 +100,9 @@ def get_domains():
 
 def test(nodetype, nodelabel):
 	statement = "MATCH (n:" + nodetype + " {name:'" + nodelabel + "'}) RETURN n"
-	headers = { "Accept": "application/json; charset=UTF-8",
-		"Content-Type": "application/json",
-		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
-	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
 	print(r.text)
 
-main(sys.argv[1:])
+if __name__ == '__main__':
+	main(sys.argv[1:])
