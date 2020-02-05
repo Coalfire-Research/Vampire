@@ -22,6 +22,7 @@ Considerations
 
  - neo4j must be running on localhost, on the standard port - 7474
  - Your neo4j database creds should be Kali standard `neo4j:BloodHound` (you can change the base64 in `owned_utils.py` otherwise)
+ - `echo -n 'neo4j:yourpassword' | base64` and then replace the auth in owned_utils.py
 
 Benefits
 ---
