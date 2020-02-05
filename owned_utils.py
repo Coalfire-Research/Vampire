@@ -5,9 +5,6 @@
 import requests, json
 import getopt, sys
 
-# base64("neo4j:BloodHound")
-auth = "bmVvNGo6Qmxvb2Rob3VuZA=="
-
 def main(argv):
 	node_type = ''
 	node_label = ''
@@ -42,19 +39,10 @@ def mux(request, node_type, node_label):
 		create(node_type, node_label)
 	elif request == 'exists':
 		exists(node_type, node_label)
-	elif request == 'decide':
-		decide(node_type, node_label)
+	elif request == 'exists_like':
+		exists_starts_with(node_type, node_label)
 	else:
 		print("Error: unknown request type")
-
-def decide(nodetype, nodelabel):
-	if exists(nodetype, nodelabel):
-		mark_owned(nodetype, nodelabel)
-	elif nodetype == "Domain":
-		create(nodetype, nodelabel)
-	else:
-		create(nodetype, nodelabel)
-		mark_owned(nodetype, nodelabel)
 
 def mark_owned(nodetype, nodelabel):
 	statement = 'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" SET n.owned = TRUE'
@@ -70,16 +58,30 @@ def create(nodetype, nodelabel):
 	statement = "CREATE (n:" + nodetype + ') SET n.name="' + nodelabel + '"'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
+
+def exists_starts_with(nodetype, nodelabel):
+	statement = 'START n = node(' + nodetype + ') WHERE lower(n.name) STARTS WITH "' + nodelabel.lower() + '" RETURN n'
+	headers = { "Accept": "application/json; charset=UTF-8",
+		"Content-Type": "application/json",
+		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
+	data = {"statements": [{'statement': statement}]}
+	url = 'http://localhost:7474/db/data/transaction/commit'
+	r = requests.post(url=url,headers=headers,json=data)
+	if nodelabel in r.text:
+		print(1)
+	else:
+		print(r.text)
+		print(0)
 
 def exists(nodetype, nodelabel):
 	statement = 'START n = node(*) WHERE lower(n.name) = "' + nodelabel.lower() + '" RETURN n'
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
@@ -92,7 +94,7 @@ def get_domains():
 	statement = "MATCH (n:Domain) RETURN n"
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
@@ -106,7 +108,7 @@ def test(nodetype, nodelabel):
 	statement = "MATCH (n:" + nodetype + " {name:'" + nodelabel + "'}) RETURN n"
 	headers = { "Accept": "application/json; charset=UTF-8",
 		"Content-Type": "application/json",
-		"Authorization": auth }
+		"Authorization": "bmVvNGo6Qmxvb2RIb3VuZA==" }
 	data = {"statements": [{'statement': statement}]}
 	url = 'http://localhost:7474/db/data/transaction/commit'
 	r = requests.post(url=url,headers=headers,json=data)
