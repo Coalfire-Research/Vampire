@@ -50,6 +50,11 @@ How it works
  1. Checks the user exists
  1. Marks new credentials as owned
 
+Extensibility
+---
+
+The cna script handles the Cobalt Strike GUI, while the Python script handles Bloodhound/neo4j interaction. The reason I did it this way is because I couldn't get the HTTP request working nicely through Sleep sockets. The plus side is, you can call/import the Python code into your own project which doesn't use Cobalt Strike. The code in the functions is pretty much ripped from the neo4j syntax examples in the Bloodhound Github wiki.
+
 Author
 ---
 
